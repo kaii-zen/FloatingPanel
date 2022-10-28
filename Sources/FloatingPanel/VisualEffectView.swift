@@ -8,46 +8,51 @@
 import SwiftUI
  
 /// Bridge AppKit's NSVisualEffectView into SwiftUI
-struct VisualEffectView: NSViewRepresentable {
+public struct VisualEffectView: NSViewRepresentable {
     var material: NSVisualEffectView.Material
-//    var blendingMode: NSVisualEffectView.BlendingMode
-//    var state: NSVisualEffectView.State
-//    var emphasized: Bool
- 
-    func makeNSView(context: Context) -> NSVisualEffectView {
+    var blendingMode: NSVisualEffectView.BlendingMode
+    var state: NSVisualEffectView.State
+    var isEmphasized: Bool
+    
+    public init(material: NSVisualEffectView.Material = .sidebar,
+                blendingMode: NSVisualEffectView.BlendingMode = .behindWindow,
+                state: NSVisualEffectView.State = .active,
+                isEmphasized: Bool = true) {
+        self.material = material
+        self.blendingMode = blendingMode
+        self.state = state
+        self.isEmphasized = isEmphasized
+    }
+    
+    public func makeNSView(context: Context) -> NSVisualEffectView {
         context.coordinator.visualEffectView
     }
  
-    func updateNSView(_ view: NSVisualEffectView, context: Context) {
+    public func updateNSView(_ view: NSVisualEffectView, context: Context) {
         context.coordinator.update(
-            material: material
-//            ,
-//            blendingMode: blendingMode,
-//            state: state
-//            ,
-//            emphasized: emphasized
+            material: material,
+            blendingMode: blendingMode,
+            state: state,
+            isEmphasized: isEmphasized
         )
     }
  
-    func makeCoordinator() -> Coordinator {
+    public func makeCoordinator() -> Coordinator {
         Coordinator()
     }
  
-    class Coordinator {
+    public class Coordinator {
         let visualEffectView = NSVisualEffectView()
  
-        init() {
-//            visualEffectView.blendingMode = .withinWindow
-        }
- 
-        func update(material: NSVisualEffectView.Material
-//                    ,
-//                        blendingMode: NSVisualEffectView.BlendingMode,
-//                        state: NSVisualEffectView.State
-//                    ,
-//                        emphasized: Bool
+        func update(material: NSVisualEffectView.Material,
+                    blendingMode: NSVisualEffectView.BlendingMode,
+                    state: NSVisualEffectView.State,
+                    isEmphasized: Bool
         ) {
             visualEffectView.material = material
+            visualEffectView.blendingMode = blendingMode
+            visualEffectView.state = state
+            visualEffectView.isEmphasized = isEmphasized
         }
     }
   }

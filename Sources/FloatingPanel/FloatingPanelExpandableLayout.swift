@@ -18,13 +18,24 @@ public struct FloatingPanelExpandableLayout<Toolbar: View, Sidebar: View, Conten
     /// The minimum width for both views to show
     var totalWidth: CGFloat = 512.0
     /// The minimum height
-    var minHeight: CGFloat = 512.0
+//    var minHeight: CGFloat = 512.0
+    var minHeight: CGFloat = 256.0
  
     /// Stores the expanded width of the view on toggle
     @State var expandedWidth = 512.0
  
     /// Stores a reference to the parent panel instance
     @Environment(\.floatingPanel) var panel
+    
+    public init(toolbar: @escaping () -> Toolbar, sidebar: @escaping () -> Sidebar, content: @escaping () -> Content, sidebarWidth: CGFloat = 256.0, totalWidth: CGFloat = 512.0, minHeight: CGFloat = 20.0, expandedWidth: Double = 512.0) {
+        self.toolbar = toolbar
+        self.sidebar = sidebar
+        self.content = content
+        self.sidebarWidth = sidebarWidth
+        self.totalWidth = totalWidth
+        self.minHeight = minHeight
+        self.expandedWidth = expandedWidth
+    }
     
     public var body: some View {
         GeometryReader { geo in
@@ -34,6 +45,7 @@ public struct FloatingPanelExpandableLayout<Toolbar: View, Sidebar: View, Conten
                 VStack(spacing: 0) {
                     /// Display toolbar and toggle button
                     HStack {
+                        Image(systemName: "calendar")
                         toolbar()
                         Spacer()
      
@@ -48,38 +60,37 @@ public struct FloatingPanelExpandableLayout<Toolbar: View, Sidebar: View, Conten
                     }
                     .padding(16)
      
-                    /// Add a visual cue to separate the sections
-                    Divider()
-     
-                    /// Display sidebar and content view
-                    HStack(spacing: 0) {
-                        /// Display the sidebar and center it in a vertical stack to fill in the space
-                        VStack {
-                            Spacer()
-                            /// Set the minimum width to the sidebar width, and the maximum width if expanded to the sidebar width, otherwise set it to the total width
-                            sidebar()
-                                .frame(minWidth: sidebarWidth, maxWidth: expanded(for: geo.size.width) ? sidebarWidth : totalWidth)
-                            Spacer()
-                        }
-     
-                        /// Only show content view if expanded
-                        /// Set its frame so it's centered no matter what
-                        /// Include the divider in this, since we don't want a divider lying around if there is nothing to divide
-                        /// Also attach a move from edge transition
-                        if expanded(for: geo.size.width) {
-                            HStack(spacing: 0) {
-                                Divider()
-                                content()
-                                    .frame(width: geo.size.width-sidebarWidth)
+                    if false {
+                        /// Display sidebar and content view
+                        HStack(spacing: 0) {
+                            /// Display the sidebar and center it in a vertical stack to fill in the space
+                            VStack {
+                                Spacer()
+                                /// Set the minimum width to the sidebar width, and the maximum width if expanded to the sidebar width, otherwise set it to the total width
+                                sidebar()
+                                    .frame(minWidth: sidebarWidth, maxWidth: expanded(for: geo.size.width) ? sidebarWidth : totalWidth)
+                                Spacer()
                             }
-                            .transition(.move(edge: .trailing))
+                            
+                            /// Only show content view if expanded
+                            /// Set its frame so it's centered no matter what
+                            /// Include the divider in this, since we don't want a divider lying around if there is nothing to divide
+                            /// Also attach a move from edge transition
+                            if expanded(for: geo.size.width) {
+                                HStack(spacing: 0) {
+                                    Divider()
+                                    content()
+                                        .frame(width: geo.size.width-sidebarWidth)
+                                }
+                                .transition(.move(edge: .trailing))
+                            }
                         }
+                        .animation(.spring(), value: expanded(for: geo.size.width))
                     }
-                    .animation(.spring(), value: expanded(for: geo.size.width))
                 }
             }
         }
-        .frame(minWidth: sidebarWidth, minHeight: minHeight)
+            .frame(minWidth: expandedWidth, minHeight: minHeight)
     }
 
     /// Toggle the expanded state of the panel
